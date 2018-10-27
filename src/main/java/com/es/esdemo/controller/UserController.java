@@ -443,6 +443,29 @@ public class UserController {
 		
 		return hits.getTotalHits();
 	}
+	
+	@GetMapping("/user/query13")
+	public Object query13() throws IOException {
+		TransportClient client = EsUtils.getClient();
+		// 
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		
+		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("username", "*be*"));
+		boolQueryBuilder.should(QueryBuilders.matchPhraseQuery("pwd", "*123*"));
+		
+		SearchResponse sr = client.prepareSearch("index1", "index2")
+							.setQuery(boolQueryBuilder)
+							.setTypes("type1", "type2")
+							.setFrom(0)
+							.setSize(3)
+							.get();
+		SearchHits hits = sr.getHits();
+		for(SearchHit hit: hits) {
+			System.out.println(hit.getSourceAsString());
+		}
+		
+		return hits.getTotalHits();
+	}
 }
 
 
